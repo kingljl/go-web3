@@ -28,8 +28,7 @@ func (c *Contract) Address() common.Address {
 	return c.addr
 }
 
-func (c *Contract) Call(methodName string, args ...interface{}) (interface{}, error) {
-
+func (c *Contract) CallWithFrom(methodName string, from common.Address, args ...interface{}) (interface{}, error) {
 	data, err := c.EncodeABI(methodName, args...)
 
 	if err != nil {
@@ -37,6 +36,7 @@ func (c *Contract) Call(methodName string, args ...interface{}) (interface{}, er
 	}
 
 	msg := &types.ZeroValueCallMsg{
+		From: from,
 		To:   c.addr,
 		Data: data,
 	}
@@ -59,6 +59,10 @@ func (c *Contract) Call(methodName string, args ...interface{}) (interface{}, er
 		return response, nil
 	}
 	return response[0], nil
+}
+
+func (c *Contract) Call(methodName string, args ...interface{}) (interface{}, error) {
+	return c.CallWithFrom(methodName,common.HexToAddress(""),args...);
 }
 
 func (c *Contract) CallWithMultiReturns(methodName string, args ...interface{}) ([]interface{}, error) {
